@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Maker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #1e3a8a;
+            font-size: 2.5em;
+        }
+
+        .lang-switch {
+            padding: 10px 20px;
+            background: #1e3a8a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .lang-switch:hover {
+            background: #1e40af;
+        }
+
+        .input-section {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .input-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: #1e3a8a;
+        }
+
+        .constraint-section {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .constraint-title {
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .constraint-help {
+            color: #64748b;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(30, 58, 138, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .output-section {
+            margin-top: 40px;
+        }
+
+        .groups-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .group {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .group-title {
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 12px;
+            font-size: 1.2em;
+        }
+
+        .number {
+            background: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin: 5px;
+            display: inline-block;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            color: #333;
+            font-weight: 500;
+        }
+
+        .error {
+            color: #e74c3c;
+            text-align: center;
+            margin-top: 20px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 id="mainTitle">🔢 Group Maker</h1>
+            <button class="lang-switch" onclick="toggleLanguage()">
+                <span id="langButton">ไทย</span>
+            </button>
+        </div>
+        
+        <div class="input-section">
+            <div class="input-group">
+                <label for="numCount" id="labelNumCount">How many numbers?</label>
+                <input type="number" id="numCount" min="1" value="20" placeholder="e.g., 20">
+            </div>
+            
+            <div class="input-group">
+                <label for="groupCount" id="labelGroupCount">How many groups?</label>
+                <input type="number" id="groupCount" min="1" value="4" placeholder="e.g., 4">
+            </div>
+        </div>
+
+        <div class="constraint-section">
+            <div class="constraint-title" id="mustTogetherTitle">Numbers that MUST be together</div>
+            <div class="constraint-help" id="mustTogetherHelp">Enter numbers separated by commas (e.g., 1,5,9 will keep these three together)</div>
+            <input type="text" id="mustTogether" placeholder="e.g., 1,5,9">
+        </div>
+
+        <div class="constraint-section">
+            <div class="constraint-title" id="cantTogetherTitle">Numbers that CAN'T be together</div>
+            <div class="constraint-help" id="cantTogetherHelp">Enter pairs separated by semicolons (e.g., 2,3;4,7 means 2 and 3 can't be together, 4 and 7 can't be together)</div>
+            <input type="text" id="cantTogether" placeholder="e.g., 2,3;4,7">
+        </div>
+        
+        <button onclick="generateGroups()" id="generateButton">Generate Groups</button>
+        
+        <div class="output-section" id="output"></div>
+    </div>
+
+    <script>
+        let currentLang = 'en';
+
+        const translations = {
+            en: {
+                mainTitle: '🔢 Group Maker',
+                langButton: 'ไทย',
+                labelNumCount: 'How many numbers?',
+                labelGroupCount: 'How many groups?',
+                mustTogetherTitle: 'Numbers that MUST be together',
+                mustTogetherHelp: 'Enter numbers separated by commas (e.g., 1,5,9 will keep these three together)',
+                cantTogetherTitle: 'Numbers that CAN\'T be together',
+                cantTogetherHelp: 'Enter pairs separated by semicolons (e.g., 2,3;4,7 means 2 and 3 can\'t be together, 4 and 7 can\'t be together)',
+                generateButton: 'Generate Groups',
+                groupLabel: 'Group',
+                errorInvalid: 'Please enter valid positive numbers!',
+                errorTooManyGroups: 'Number of groups cannot exceed number of numbers!',
+                errorConstraint: 'Unable to create groups with the given constraints. Please try different settings.',
+                errorInvalidFormat: 'Invalid format in constraints. Please check your input.'
+            },
+            th: {
+                mainTitle: '🔢 สร้างกลุ่ม',
+                langButton: 'EN',
+                labelNumCount: 'จำนวนตัวเลขทั้งหมด?',
+                labelGroupCount: 'จำนวนกลุ่ม?',
+                mustTogetherTitle: 'ตัวเลขที่ต้องอยู่ด้วยกัน',
+                mustTogetherHelp: 'ใส่ตัวเลขคั่นด้วยเครื่องหมายจุลภาค (เช่น 1,5,9 จะทำให้สามตัวนี้อยู่กลุ่มเดียวกัน)',
+                cantTogetherTitle: 'ตัวเลขที่ต้องไม่อยู่ด้วยกัน',
+                cantTogetherHelp: 'ใส่คู่ตัวเลขคั่นด้วยเครื่องหมายอัฒภาค (เช่น 2,3;4,7 หมายถึง 2 กับ 3 ต้องไม่อยู่ด้วยกัน และ 4 กับ 7 ต้องไม่อยู่ด้วยกัน)',
+                generateButton: 'สร้างกลุ่ม',
+                groupLabel: 'กลุ่ม',
+                errorInvalid: 'กรุณาใส่ตัวเลขที่ถูกต้อง!',
+                errorTooManyGroups: 'จำนวนกลุ่มต้องไม่เกินจำนวนตัวเลข!',
+                errorConstraint: 'ไม่สามารถสร้างกลุ่มตามเงื่อนไขที่กำหนดได้ กรุณาลองตั้งค่าใหม่',
+                errorInvalidFormat: 'รูปแบบของเงื่อนไขไม่ถูกต้อง กรุณาตรวจสอบข้อมูล'
+            }
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'th' : 'en';
+            updateLanguage();
+        }
+
+        function updateLanguage() {
+            const t = translations[currentLang];
+            document.getElementById('mainTitle').textContent = t.mainTitle;
+            document.getElementById('langButton').textContent = t.langButton;
+            document.getElementById('labelNumCount').textContent = t.labelNumCount;
+            document.getElementById('labelGroupCount').textContent = t.labelGroupCount;
+            document.getElementById('mustTogetherTitle').textContent = t.mustTogetherTitle;
+            document.getElementById('mustTogetherHelp').textContent = t.mustTogetherHelp;
+            document.getElementById('cantTogetherTitle').textContent = t.cantTogetherTitle;
+            document.getElementById('cantTogetherHelp').textContent = t.cantTogetherHelp;
+            document.getElementById('generateButton').textContent = t.generateButton;
+        }
+
+        function parseConstraints(input) {
+            if (!input.trim()) return [];
+            return input.split(';').map(group => 
+                group.split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n))
+            ).filter(group => group.length > 0);
+        }
+
+        function generateGroups() {
+            const t = translations[currentLang];
+            const numCount = parseInt(document.getElementById('numCount').value);
+            const groupCount = parseInt(document.getElementById('groupCount').value);
+            const mustTogetherInput = document.getElementById('mustTogether').value;
+            const cantTogetherInput = document.getElementById('cantTogether').value;
+            const output = document.getElementById('output');
+            
+            // Validation
+            if (!numCount || !groupCount || numCount < 1 || groupCount < 1) {
+                output.innerHTML = `<p class="error">${t.errorInvalid}</p>`;
+                return;
+            }
+            
+            if (groupCount > numCount) {
+                output.innerHTML = `<p class="error">${t.errorTooManyGroups}</p>`;
+                return;
+            }
+
+            // Parse constraints
+            const mustTogether = parseConstraints(mustTogetherInput);
+            const cantTogether = parseConstraints(cantTogetherInput);
+
+            // Create array of numbers
+            let numbers = Array.from({length: numCount}, (_, i) => i + 1);
+            const groups = Array.from({length: groupCount}, () => []);
+
+            try {
+                // First, place "must be together" groups
+                mustTogether.forEach(mustGroup => {
+                    const validNums = mustGroup.filter(n => n >= 1 && n <= numCount);
+                    if (validNums.length > 0) {
+                        // Find a group with space or the emptiest group
+                        const targetGroup = groups.reduce((min, curr) => 
+                            curr.length < min.length ? curr : min
+                        );
+                        
+                        validNums.forEach(num => {
+                            targetGroup.push(num);
+                            numbers = numbers.filter(n => n !== num);
+                        });
+                    }
+                });
+
+                // Shuffle remaining numbers
+                for (let i = numbers.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
+                }
+
+                // Distribute remaining numbers while respecting "can't be together" constraints
+                for (let num of numbers) {
+                    let placed = false;
+                    const groupIndices = Array.from({length: groupCount}, (_, i) => i);
+                    
+                    // Shuffle group order to randomize placement
+                    for (let i = groupIndices.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [groupIndices[i], groupIndices[j]] = [groupIndices[j], groupIndices[i]];
+                    }
+
+                    for (let gi of groupIndices) {
+                        const group = groups[gi];
+                        let canPlace = true;
+
+                        // Check if this number can be placed in this group
+                        for (let cantPair of cantTogether) {
+                            if (cantPair.includes(num)) {
+                                const otherNums = cantPair.filter(n => n !== num);
+                                if (otherNums.some(n => group.includes(n))) {
+                                    canPlace = false;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (canPlace) {
+                            group.push(num);
+                            placed = true;
+                            break;
+                        }
+                    }
+
+                    if (!placed) {
+                        throw new Error('Cannot satisfy constraints');
+                    }
+                }
+
+                // Sort numbers within each group
+                groups.forEach(group => group.sort((a, b) => a - b));
+
+                // Display the groups
+                let html = '<div class="groups-container">';
+                groups.forEach((group, index) => {
+                    html += `
+                        <div class="group">
+                            <div class="group-title">${t.groupLabel} ${index + 1}</div>
+                            <div>
+                                ${group.map(num => `<span class="number">${num}</span>`).join('')}
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                
+                output.innerHTML = html;
+
+            } catch (error) {
+                output.innerHTML = `<p class="error">${t.errorConstraint}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
